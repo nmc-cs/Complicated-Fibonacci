@@ -7,7 +7,7 @@ services:
     #   POSTGRES_HOST_AUTH_METHOD: "trust"
   redis:
     image: "redis:latest"
-  server:
+  api: #aka server, changed due to nginx term 'server'
     build:
       dockerfile: Dockerfile.dev
       context: ./server
