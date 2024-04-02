@@ -5,9 +5,11 @@ services:
     # environment:
     #   POSTGRES_DB: "db"
     #   POSTGRES_HOST_AUTH_METHOD: "trust"
+    environment:
+      - POSTGRES_PASSWORD=postgres_password
   redis:
     image: "redis:latest"
-  api: #aka server, changed due to nginx term 'server'
+  api: #aka server, changed due to nginx conflict term 'server'
     build:
       dockerfile: Dockerfile.dev
       context: ./server
@@ -23,6 +25,8 @@ services:
       - PGPASSWORD=postgres_password
       - PGPORT=5432
   client:
+    environment:
+      - WDS_SOCKET_PORT=0
     build:
       dockerfile: Dockerfile.dev
       context: ./client
@@ -36,10 +40,16 @@ services:
     volumes:
       - /app/node_modules
       - ./worker:/app
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
   nginx:
+    depends_on:
+      - api
+      - client
     restart: always
     build:
       dockerfile: Dockerfile.dev
       context: ./nginx
     ports:
-      - '3050:80'
+      - "3050:80"
